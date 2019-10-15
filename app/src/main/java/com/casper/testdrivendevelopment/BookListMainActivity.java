@@ -2,6 +2,7 @@ package com.casper.testdrivendevelopment;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,6 +24,12 @@ import java.util.List;
 
 public class BookListMainActivity extends AppCompatActivity {
 
+    public static final int CONTEXT_NEW_BOOK = 1;
+    public static final int CONTEXT_DELETE_BOOK = CONTEXT_NEW_BOOK+1;
+    public static final int CONTEXT_UPDATE_BOOK = CONTEXT_DELETE_BOOK+1;
+    public static final int CONTEXT_ABOUT_BOOK = CONTEXT_UPDATE_BOOK+1;
+    public static final int REQUEST_CODE_NEW_BOOK=901;
+    public static final int REQUEST_CODE_UPDATE_BOOK=902;
     private ListView bookListView;
     private ArrayList<Book> list_books;
     private booksAdapter theAdapter;
@@ -48,7 +55,8 @@ public class BookListMainActivity extends AppCompatActivity {
             menu.setHeaderTitle(list_books.get(itemPosition).getTitle());
             menu.add(0,1,0,"新建");
             menu.add(0,2,0,"删除");
-            menu.add(0,3,0,"关于...");
+            menu.add(0,3,0,"修改");
+            menu.add(0,4,0,"关于...");
         }
         super.onCreateContextMenu(menu,v,menuInfo);
     }
@@ -56,16 +64,16 @@ public class BookListMainActivity extends AppCompatActivity {
     @Override
     public boolean onContextItemSelected(MenuItem item){
         switch (item.getItemId()){
-            case 1:{
-                AdapterView.AdapterContextMenuInfo menuInfo=(AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-                list_books.add(menuInfo.position,new Book("Android Studio应用程序设计(第2版)－微课版",R.drawable.book_3));
-                theAdapter.notifyDataSetChanged();
+            case CONTEXT_NEW_BOOK:{
+                Intent intent = new Intent(this, EditBookActivity.class);
+                intent.putExtra("title", "无名书籍");
+                intent.putExtra("insert_position", ((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).position);
+                startActivityForResult(intent, REQUEST_CODE_NEW_BOOK);
 
-                Toast.makeText(this,"新建成功",Toast.LENGTH_SHORT).show();
 
                 break;
             }
-            case 2:{
+            case CONTEXT_DELETE_BOOK:{
                 AdapterView.AdapterContextMenuInfo menuInfo=(AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
                 final int itemPosition=menuInfo.position;
                 new android.app.AlertDialog.Builder(this)
@@ -91,7 +99,15 @@ public class BookListMainActivity extends AppCompatActivity {
 
                 break;
             }
-            case 3:{
+            case CONTEXT_UPDATE_BOOK:{
+                int position=((AdapterView.AdapterContextMenuInfo)item.getMenuInfo()).position;
+                Intent intent = new Intent(this, EditBookActivity.class);
+                intent.putExtra("title", list_books.get(position).getTitle());
+                intent.putExtra("insert_position", ((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).position);
+                startActivityForResult(intent, REQUEST_CODE_UPDATE_BOOK);
+                break;
+            }
+            case CONTEXT_ABOUT_BOOK:{
                 AdapterView.AdapterContextMenuInfo menuInfo=(AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
                 final int itemPosition=menuInfo.position;
                 Toast.makeText(this,"这是第"+(itemPosition+1)+"本书",Toast.LENGTH_SHORT).show();
@@ -99,6 +115,32 @@ public class BookListMainActivity extends AppCompatActivity {
             }
         }
         return super.onContextItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_CODE_NEW_BOOK:
+                if(resultCode==RESULT_OK){
+                    String title=data.getStringExtra("title");
+                    int insertPosition = data.getIntExtra("insert_position", 0);
+                    getListBooks().add(insertPosition,new Book(title,R.drawable.book_no_name));
+                    theAdapter.notifyDataSetChanged();
+                    Toast.makeText(this,"新建成功",Toast.LENGTH_SHORT).show();
+                }
+                break;
+
+            case REQUEST_CODE_UPDATE_BOOK:
+                if (resultCode == RESULT_OK) {
+                    int insertPosition = data.getIntExtra("insert_position", 0);
+                    Book bookAtAdapter=getListBooks().get(insertPosition);
+                    bookAtAdapter.setTitle(data.getStringExtra("title"));
+                    theAdapter.notifyDataSetChanged();
+                }
+                break;
+        }
+
     }
 
     private void init() {
