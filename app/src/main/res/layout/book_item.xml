@@ -12,9 +12,37 @@
         android:layout_alignParentLeft="true"
         app:srcCompat="@mipmap/ic_launcher" />
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/textViewname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="书籍名称："
+        android:paddingTop="70dp"/>
+
     <TextView
         android:id="@+id/text_view_book_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"/>
+        android:layout_toRightOf="@id/textViewname"
+        android:paddingTop="70dp"/>
+
+        <TextView
+            android:id="@+id/textViewprice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textViewname"
+            android:paddingTop="30dp"
+            android:text="价格（元）：" />
+
+        <TextView
+        android:id="@+id/text_view_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/textViewprice"
+            android:layout_marginTop="120dp" />
+    </RelativeLayout>
 </LinearLayout>
