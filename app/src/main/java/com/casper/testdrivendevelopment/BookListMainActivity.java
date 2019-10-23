@@ -33,7 +33,7 @@ public class BookListMainActivity extends AppCompatActivity {
     public static final int REQUEST_CODE_NEW_BOOK=901;
     public static final int REQUEST_CODE_UPDATE_BOOK=902;
     private ListView bookListView;
-    private ArrayList<Book> list_books;
+    private ArrayList<Book> list_books=new ArrayList<>();
     private booksAdapter theAdapter;
     private BookSaver bookSaver;
 
@@ -158,7 +158,6 @@ public class BookListMainActivity extends AppCompatActivity {
     }
 
     private void init() {
-        list_books=new ArrayList<>();
         list_books.add(new Book("软件项目管理案例教程（第4版）",10.0, R.drawable.book_2));
         list_books.add(new Book("创新工程实践",20.0, R.drawable.book_no_name));
         list_books.add(new Book("信息安全数学基础（第2版）",30.0, R.drawable.book_1));
