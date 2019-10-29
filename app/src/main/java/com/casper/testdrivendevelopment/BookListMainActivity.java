@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -18,7 +21,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.casper.testdrivendevelopment.data.BookFragmentAdapter;
+import com.casper.testdrivendevelopment.data.BookListFragment;
 import com.casper.testdrivendevelopment.data.BookSaver;
+import com.casper.testdrivendevelopment.data.NewsFragment;
+import com.casper.testdrivendevelopment.data.VendorFragment;
 import com.casper.testdrivendevelopment.data.model.Book;
 
 import java.util.ArrayList;
@@ -32,7 +39,6 @@ public class BookListMainActivity extends AppCompatActivity {
     public static final int CONTEXT_ABOUT_BOOK = CONTEXT_UPDATE_BOOK+1;
     public static final int REQUEST_CODE_NEW_BOOK=901;
     public static final int REQUEST_CODE_UPDATE_BOOK=902;
-    private ListView bookListView;
     private ArrayList<Book> list_books=new ArrayList<>();
     private booksAdapter theAdapter;
     private BookSaver bookSaver;
@@ -51,18 +57,32 @@ public class BookListMainActivity extends AppCompatActivity {
         bookSaver=new BookSaver(this);
         list_books=bookSaver.load();
         if(list_books.size()==0)
-             init();
+            init();
+        theAdapter=new booksAdapter(BookListMainActivity.this,R.layout.book_item,list_books);
 
-        bookListView= (ListView) this.findViewById(R.id.list_view_books);
-        theAdapter=new booksAdapter(this,R.layout.book_item,list_books);
-        bookListView.setAdapter(theAdapter);
+        ArrayList<String> titleDatas=new ArrayList<>();
+        titleDatas.add("图书");
+        titleDatas.add("新闻");
+        titleDatas.add("卖家");
 
-        this.registerForContextMenu(bookListView);
+        ArrayList<Fragment> fragmentList = new ArrayList<Fragment>();
+        fragmentList.add(new BookListFragment(theAdapter));
+        fragmentList.add(new NewsFragment());
+        fragmentList.add(new VendorFragment());
+
+        BookFragmentAdapter bookFragmentAdapter = new BookFragmentAdapter(getSupportFragmentManager(), titleDatas, fragmentList);
+
+        TabLayout tCoupon=findViewById(R.id.t_coupon);
+        ViewPager vpCoupon=findViewById(R.id.vp_coupon);
+        vpCoupon.setAdapter(bookFragmentAdapter);
+        tCoupon.setupWithViewPager(vpCoupon);
+        tCoupon.setTabsFromPagerAdapter(bookFragmentAdapter);
+//
     }
 
     @Override
     public void onCreateContextMenu(ContextMenu menu,View v,ContextMenu.ContextMenuInfo menuInfo){
-        if(v==bookListView){
+        if(v==findViewById(R.id.list_view_books)){
             int itemPosition=((AdapterView.AdapterContextMenuInfo)menuInfo).position;
             menu.setHeaderTitle(list_books.get(itemPosition).getTitle());
             menu.add(0,1,0,"新建");
@@ -167,7 +187,7 @@ public class BookListMainActivity extends AppCompatActivity {
         return list_books;
     }
 
-    class booksAdapter extends ArrayAdapter<Book>{
+    public class booksAdapter extends ArrayAdapter<Book>{
         private int resourceId;
         public booksAdapter(@NonNull Context context, int resource, @NonNull List<Book> objects) {
             super(context, resource, objects);
