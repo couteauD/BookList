@@ -1,7 +1,10 @@
 package com.casper.testdrivendevelopment.data;
 
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,13 +24,18 @@ import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.map.TextOptions;
 import com.baidu.mapapi.model.LatLng;
 import com.casper.testdrivendevelopment.R;
+import com.casper.testdrivendevelopment.data.model.Shop;
+
+import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class VendorFragment extends Fragment {
 
-    private MapView mMapView=null;
+    private MapView mapView=null;
+
     public VendorFragment() {
         // Required empty public constructor
     }
@@ -38,22 +46,22 @@ public class VendorFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view=inflater.inflate(R.layout.fragment_vendor, container, false);
-        MapView mapView=(MapView)view.findViewById(R.id.bmapView);
+        mapView=(MapView)view.findViewById(R.id.bmapView);
         BaiduMap baiduMap = mapView.getMap();
         LatLng centerPoint = new LatLng(22.2559,113.541112);
         //修改百度地图的初始位置
         MapStatus mMapStatus = new MapStatus.Builder()
-                .target(centerPoint).zoom(18).build();
+                .target(centerPoint).zoom(17).build();
         MapStatusUpdate mMapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mMapStatus);
         baiduMap.setMapStatus(mMapStatusUpdate);
-        //添加标记点
-        BitmapDescriptor bitmap = BitmapDescriptorFactory.fromResource(R.drawable.book_icon);
-        MarkerOptions markerOption = new MarkerOptions().icon(bitmap).position(centerPoint);
-        Marker marker = (Marker) baiduMap.addOverlay(markerOption);
-        //添加文字
-        OverlayOptions textOption = new TextOptions().bgColor(0xAAFFFF00).fontSize(45)
-                .fontColor(0xFFFF00FF).text("暨南大学珠海").rotate(0).position(centerPoint);
-        baiduMap.addOverlay(textOption);
+//        //添加标记点
+//        BitmapDescriptor bitmap = BitmapDescriptorFactory.fromResource(R.drawable.book_icon);
+//        MarkerOptions markerOption = new MarkerOptions().icon(bitmap).position(centerPoint);
+//        Marker marker = (Marker) baiduMap.addOverlay(markerOption);
+//        //添加文字
+//        OverlayOptions textOption = new TextOptions().bgColor(0xAAFFFF00).fontSize(45)
+//                .fontColor(0xFFFF00FF).text("暨南大学珠海").rotate(0).position(centerPoint);
+//        baiduMap.addOverlay(textOption);
         //响应事件
         baiduMap.setOnMarkerClickListener(new BaiduMap.OnMarkerClickListener() {
             @Override
@@ -62,25 +70,52 @@ public class VendorFragment extends Fragment {
                 return false;
             }
     });
+        final ShopLoader shopLoader = new ShopLoader();
+        @SuppressLint("HandlerLeak") Handler handler = new Handler() {
+            public void handleMessage(Message msg) {
+                drawshop(shopLoader.getShops());
+            };
+        };
+        shopLoader.load(handler, "http://file.nidama.net/class/mobile_develop/data/bookstore.json");
         return view;
     }
+
+    void drawshop(ArrayList<Shop> shops){
+        if(mapView==null)
+            return;
+        BaiduMap mBaiduMap = mapView.getMap();
+        for(int i=0;i<shops.size();i++){
+            Shop shop=shops.get(i);
+
+            LatLng cenpt = new LatLng(shop.getLatitude(),shop.getLongitude());
+            BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.book_icon);
+            MarkerOptions markerOption = new MarkerOptions().icon(bitmapDescriptor).position(cenpt);
+            Marker marker = (Marker) mBaiduMap.addOverlay(markerOption);
+
+            //添加文字
+            OverlayOptions textOption = new TextOptions().bgColor(0xAAFFFF00).fontSize(45)
+                    .fontColor(0xFFFF00FF).text(shop.getName()).rotate(0).position(cenpt);
+            mBaiduMap.addOverlay(textOption);
+        }
+    }
+
     @Override
     public void onResume() {
         super.onResume();
         //在activity执行onResume时执行mMapView. onResume ()，实现地图生命周期管理
-        if(mMapView!=null) mMapView.onResume();
+        if(mapView!=null) mapView.onResume();
     }
     @Override
     public void onPause() {
         super.onPause();
         //在activity执行onPause时执行mMapView. onPause ()，实现地图生命周期管理
-        if(mMapView!=null) mMapView.onPause();
+        if(mapView!=null) mapView.onPause();
     }
     @Override
     public void onDestroy() {
         super.onDestroy();
         //在activity执行onDestroy时执行mMapView.onDestroy()，实现地图生命周期管理
-        if(mMapView!=null) mMapView.onDestroy();
+        if(mapView!=null) mapView.onDestroy();
     }
 
 }
