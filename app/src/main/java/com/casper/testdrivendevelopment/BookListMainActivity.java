@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.casper.testdrivendevelopment.data.BookFragmentAdapter;
 import com.casper.testdrivendevelopment.data.BookListFragment;
 import com.casper.testdrivendevelopment.data.BookSaver;
+import com.casper.testdrivendevelopment.data.GameFragment;
 import com.casper.testdrivendevelopment.data.NewsFragment;
 import com.casper.testdrivendevelopment.data.VendorFragment;
 import com.casper.testdrivendevelopment.data.model.Book;
@@ -64,11 +65,13 @@ public class BookListMainActivity extends AppCompatActivity {
         titleDatas.add("图书");
         titleDatas.add("新闻");
         titleDatas.add("卖家");
+        titleDatas.add("游戏");
 
         ArrayList<Fragment> fragmentList = new ArrayList<Fragment>();
         fragmentList.add(new BookListFragment(theAdapter));
         fragmentList.add(new NewsFragment());
         fragmentList.add(new VendorFragment());
+        fragmentList.add(new GameFragment());
 
         BookFragmentAdapter bookFragmentAdapter = new BookFragmentAdapter(getSupportFragmentManager(), titleDatas, fragmentList);
 

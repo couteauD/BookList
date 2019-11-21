@@ -18,7 +18,6 @@ public class EditBookActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_book);
-
         editTextBookName=(EditText)findViewById(R.id.edit_text_name);
         editTextBookPrice=(EditText)findViewById(R.id.edit_text_price);
         buttonOk=(Button) findViewById(R.id.button_ok);
